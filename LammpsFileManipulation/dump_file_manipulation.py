@@ -158,8 +158,8 @@ class dumpFile:
         """
         gets the area of the xy plane of the simulation cell as a box
         """
-        z_range = self.sim_zhi - sim_zlo
-        y_range = self.sim_yhi - sim_ylo
+        z_range = self.sim_zhi - self.sim_zlo
+        y_range = self.sim_yhi - self.sim_ylo
 
         return z_range*y_range
 
@@ -850,31 +850,37 @@ class dumpFile:
                 file.write("# LAMMPS data file written by LammpsFileManipulation.py \n")
 
                 if use_atomic == True or use_atomic_numberofatoms == True:
-                    file.write(str(dump_class.atomic_numberofatoms))
+                    file.write(str(self.atomic_numberofatoms))
                 else:
                     if self.sim_numberofatoms == self.atomic_numberofatoms:
-                        file.write(str(dump_class.sim_numberofatoms))
+                        file.write(str(self.sim_numberofatoms))
                     else:
                         raise Exception("The number of atoms of the simulation has changed")
 
                 file.write(" atoms \n")
-                file.write(str(max(dump_class.atoms["type"])))
+                file.write(str(max(self.atoms["type"])))
                 file.write(" atom types \n")
                 if use_atomic == True:
                     file.write(str(round(dump_class_object.atomic_xlo,precision))+" "+str(round(dump_class_object.atomic_xhi,precision))+" xlo xhi\n")
                     file.write(str(round(dump_class_object.atomic_ylo,precision))+" "+str(round(dump_class_object.atomic_yhi,precision))+" ylo yhi\n")
                     file.write(str(round(dump_class_object.atomic_zlo,precision))+" "+str(round(dump_class_object.atomic_zhi,precision))+" zlo zhi\n")
                 else:
-                    if  self.sim_xlo <= self.atomic_xlo and self.sim_ylo <= self.atomic_ylo and self.sim_zlo <= self.atomic_zlo and self.sim_xhi <= self.atomic_xhi and self.sim_yhi <= self.atomic_yhi and self.sim_zhi <= self.atomic_zhi:
+                    cartesian_tests = [self.sim_xlo <= self.atomic_xlo, 
+                                       self.sim_ylo <= self.atomic_ylo, 
+                                       self.sim_zlo <= self.atomic_zlo, 
+                                        self.sim_xhi >= self.atomic_xhi,
+                                        self.sim_yhi >= self.atomic_yhi, 
+                                        self.sim_zhi >= self.atomic_zhi]
+                    if  all(cartesian_tests):
                         file.write(str(round(dump_class_object.sim_xlo,precision))+" "+str(round(dump_class_object.sim_xhi,precision))+" xlo xhi\n")
                         file.write(str(round(dump_class_object.sim_ylo,precision))+" "+str(round(dump_class_object.sim_yhi,precision))+" ylo yhi\n")
                         file.write(str(round(dump_class_object.sim_zlo,precision))+" "+str(round(dump_class_object.sim_zhi,precision))+" zlo zhi\n")
                     else:
-                        raise Exception("The atomic data positions are not contained in the simulation bounds")
+                        raise Exception("The atomic data positions are not contained in the simulation bounds ({})".format(cartesian_tests))
                 file.write("\n\n")
                 file.write("Atoms  # atomic\n\n")
 
-            dump_class.atoms[[id,type, x, y, z]].round(precision).to_csv(file_path,mode = "a", index = False,header = False ,sep = ' ')
+            self.atoms[[id,type, x, y, z]].round(precision).to_csv(file_path,mode = "a", index = False,header = False ,sep = ' ')
             del dump_class_object
 
         else:
