@@ -352,7 +352,7 @@ class dumpFile:
             #subtraction method because pd.equals will return false unless more operations are done
             df_self = self.atomic_translate(1).atoms[[self.id,self.x_axis_cart,self.y_axis_cart,self.z_axis_cart]]
             df_other = other.atomic_translate(1).atoms[[self.id,self.x_axis_cart,self.y_axis_cart,self.z_axis_cart]]
-            df = (df_self-df_other).round(dumpFile.checking_tolerance)
+            df = (df_self-df_other).round(self.checking_tolerance)
             if df[self.id].eq(0).all() and df[self.x_axis_cart].eq(0).all()and df[self.y_axis_cart].eq(0).all() and df[self.z_axis_cart].eq(0).all():
                 return True
             else:
@@ -368,7 +368,7 @@ class dumpFile:
                         if self.boundingtypes["x"] == "pp":
                             x_vals = df[df[self.x_axis_cart] != 0].abs()#getting values of errored lists
                             #checking if magnitude is equal to the simulation axis
-                            vals = (x_vals-self.sim_xhi-self.sim_xlo).round(dumpFile.checking_tolerance)
+                            vals = (x_vals-self.sim_xhi-self.sim_xlo).round(self.checking_tolerance)
                             #adding to axes if it is true
                             if vals.eq(0).all():
                                 axes_pass += 1
@@ -383,7 +383,7 @@ class dumpFile:
                         if self.boundingtypes["y"] == "pp":
                             y_vals = df[df[self.y_axis_cart] != 0].abs()#getting values of errored lists
                             #checking if magnitude is equal to the simulation axis
-                            vals = (y_vals-self.sim_yhi-self.sim_ylo).round(dumpFile.checking_tolerance)
+                            vals = (y_vals-self.sim_yhi-self.sim_ylo).round(self.checking_tolerance)
                             #adding to axes if it is true
                             if vals.eq(0).all():
                                 axes_pass += 1
@@ -398,7 +398,7 @@ class dumpFile:
                         if self.boundingtypes["z"] == "pp":
                             z_vals = df[df[self.z_axis_cart] != 0].abs()#getting values of errored lists
                             #checking if magnitude is equal to the simulation axis
-                            vals = (z_vals-self.sim_zhi-self.sim_zlo).round(dumpFile.checking_tolerance)
+                            vals = (z_vals-self.sim_zhi-self.sim_zlo).round(self.checking_tolerance)
                             #adding to axes if it is true
                             if vals.eq(0).all():
                                 axes_pass += 1
@@ -755,7 +755,7 @@ class dumpFile:
 
         #Check if everythings within the ranges
         if mode == "a" or mode == "w":
-            precision = dumpFile.class_tolerance#get writing precision
+            precision = self.class_tolerance#get writing precision
             #defining new object
             dump_class_object = copy.deepcopy(self)
 
@@ -836,7 +836,7 @@ class dumpFile:
 
         """
         if mode == "a" or mode == "w":
-            precision = dumpFile.class_tolerance#get writing precision
+            precision = self.class_tolerance#get writing precision
             #defining new object
             dump_class_object = copy.deepcopy(self)
 
@@ -846,7 +846,7 @@ class dumpFile:
             y = dump_class_object.y_axis_cart
             z = dump_class_object.z_axis_cart
 
-            with open(file_path,"w") as file:
+            with open(file_path,mode) as file:
                 file.write("# LAMMPS data file written by LammpsFileManipulation.py \n")
 
                 if use_atomic == True or use_atomic_numberofatoms == True:
